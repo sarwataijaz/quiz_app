@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:page_transition/page_transition.dart';
+import 'final_page.dart';
 
 class Cplusplus extends StatefulWidget {
   const Cplusplus({super.key});
@@ -10,6 +12,9 @@ class Cplusplus extends StatefulWidget {
 }
 
 class _CplusplusState extends State<Cplusplus> {
+
+  int score = 0;
+
   Map<int, String> questions = {
     1: 'What is the correct way to declare a variable in C++?',
     2: 'Which of the following is the correct syntax for defining a function in C++?',
@@ -30,8 +35,27 @@ class _CplusplusState extends State<Cplusplus> {
       'int funcName() {}',
       'int funcName() []'
     ],
-    ['2 bytes', '4 bytes', '8 bytes', 'Depends on the compiler']
+    [
+      '2 bytes',
+      '4 bytes',
+      '8 bytes',
+      'Depends on the compiler'
+    ],
   ];
+
+  Map<int, String> correct_ans = {
+    1: 'int var1',
+    2: 'int funcName() {}',
+    3: '4 bytes'
+  };
+
+  Future<void> _loadData() async {
+    await Future.delayed(Duration(seconds: 1)); // Wait for 1 second
+    current_colorList = List.generate(4, (index) => Colors.white);
+    _changeQuestion();
+  }
+
+  List<Color> current_colorList = List.generate(4, (index) => Colors.white);
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +63,7 @@ class _CplusplusState extends State<Cplusplus> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     double position = 0.55;
+
 
     return Scaffold(
         body: Stack(
@@ -113,31 +138,53 @@ class _CplusplusState extends State<Cplusplus> {
             ),
           ),
         ),
-        display_option('A', count - 1, 0, screenWidth, screenHeight, position),
+        display_option('A', count - 1, 0, screenWidth, screenHeight, position, 0),
         display_option(
-            'B', count - 1, 1, screenWidth, screenHeight, position + 0.1),
+            'B', count - 1, 1, screenWidth, screenHeight, position + 0.1, 1),
         display_option(
-            'C', count - 1, 2, screenWidth, screenHeight, position + 0.2),
+            'C', count - 1, 2, screenWidth, screenHeight, position + 0.2, 2),
         display_option(
-            'D', count - 1, 3, screenWidth, screenHeight, position + 0.3),
+            'D', count - 1, 3, screenWidth, screenHeight, position + 0.3, 3),
       ],
     ));
   }
 
   Widget display_option(String option, int row, int col, double screenWidth,
-      double screenHeight, double position) {
+      double screenHeight, double position, int colorIndex) {
+
+    String currentOption = options[row][col];
+    Color optionColor = current_colorList[colorIndex];
+
     return Positioned(
       left: screenWidth * 0.1,
       right: screenWidth * 0.1,
       top: screenHeight * position,
       child: InkWell(
-        onTap: _changeQuestion,
+        onTap: (){
+          setState(() {
+            current_colorList = List.generate(
+              4,
+                  (index) => (index == colorIndex && currentOption == correct_ans[count])
+                  ? _changeColor()
+                  : (index == colorIndex
+                  ? Colors.red
+                  : Colors.white),
+            );
+          });
+          _loadData();
+        },
         child: Container(
-          height: screenHeight * 0.08,
+          height: screenHeight * 0.07,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0),
             shape: BoxShape.rectangle,
             color: Colors.white,
+            border: Border.all(
+              color:  optionColor ,
+              width: 1.8,
+              style: BorderStyle.solid,
+              strokeAlign: 1
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.5), // Shadow color
@@ -149,7 +196,6 @@ class _CplusplusState extends State<Cplusplus> {
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            //  mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Padding(
                 padding:
@@ -160,7 +206,7 @@ class _CplusplusState extends State<Cplusplus> {
                   child: LayoutBuilder(
                     builder:
                         (BuildContext context, BoxConstraints constraints) {
-                      double fontSize = constraints.maxHeight * 0.9;
+                      double fontSize = constraints.maxHeight * 0.98;
                       return Text(
                         option,
                         style: GoogleFonts.poppins(
@@ -180,7 +226,7 @@ class _CplusplusState extends State<Cplusplus> {
                 child:FittedBox (
                   fit: BoxFit.contain,
                       child:Text(
-                      options[row][col],
+                      currentOption,
                      // textAlign: (options[row][col].length>13) ? TextAlign.left : TextAlign.center,
                       style: GoogleFonts.aBeeZee(
                         textStyle: TextStyle(
@@ -195,21 +241,6 @@ class _CplusplusState extends State<Cplusplus> {
                     ),
                 ),
               ),
-              // FittedBox(
-              //   child: Text(
-              //     textAlign: TextAlign.center,
-              //     options[row][col],
-              //     style: GoogleFonts.poppins(
-              //       textStyle: TextStyle(
-              //         fontSize: 19.sp,
-              //         color: Color(0xFF5B1CAE),
-              //         // fontWeight: FontWeight.bold
-              //       ),
-              //     ),
-              //     softWrap: true,
-              //     overflow: TextOverflow.visible,
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -217,10 +248,22 @@ class _CplusplusState extends State<Cplusplus> {
     );
   }
 
+  Color _changeColor() {
+    score++;
+    return Colors.lightGreenAccent;
+  }
   void _changeQuestion() {
     setState(() {
-      if (count == 3)
-        count = 1;
+      if (count == 3) {
+        Navigator.pushReplacement(
+          context,
+            PageTransition(
+            type: PageTransitionType.fade,
+            duration: Duration(milliseconds: 100),
+            child: QuizEnd(score: score),
+            ),
+        );
+      }
       else
         count++;
     });
