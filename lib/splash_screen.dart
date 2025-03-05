@@ -5,6 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:quiz_app/main.dart';
+import 'package:quiz_app/quiz_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -73,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
       PageTransition(
         type: PageTransitionType.leftToRight,
         duration: Duration(milliseconds: 1000),
-        child: MainScreen(),
+        child: QuizScreen(),
       ),
     );
   }

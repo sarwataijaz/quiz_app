@@ -1,0 +1,273 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+
+import 'cplusplus.dart';
+
+class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
+
+  @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  NativeAd? _nativeAd;
+  bool _nativeAdIsLoaded = false;
+  late ConstrainedBox adContainer;
+
+  // TODO: replace this test ad unit with your own ad unit.
+  final String _adUnitId = '/21775744923/example/native';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadAd();
+    adContainer = ConstrainedBox(
+      constraints: const BoxConstraints(
+        minWidth: 320, // minimum recommended width
+        minHeight: 90, // minimum recommended height
+        maxWidth: 400,
+        maxHeight: 200,
+      ),
+      child: AdWidget(ad: _nativeAd!),
+    );
+  }
+
+  /// Loads a native ad.
+  void loadAd() {
+    _nativeAd = NativeAd(
+        adUnitId: _adUnitId,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            debugPrint('$NativeAd loaded.');
+            setState(() {
+              _nativeAdIsLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            // Dispose the ad here to free resources.
+            debugPrint('$NativeAd failed to load: $error');
+            ad.dispose();
+          },
+        ),
+        request: const AdRequest(),
+        // Styling
+        nativeTemplateStyle: NativeTemplateStyle(
+          // Required: Choose a template.
+            templateType: TemplateType.medium,
+            // Optional: Customize the ad's style.
+            mainBackgroundColor: Colors.purple,
+            cornerRadius: 10.0,
+            callToActionTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.cyan,
+                backgroundColor: Colors.red,
+                style: NativeTemplateFontStyle.monospace,
+                size: 16.0),
+            primaryTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.red,
+                backgroundColor: Colors.cyan,
+                style: NativeTemplateFontStyle.italic,
+                size: 16.0),
+            secondaryTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.green,
+                backgroundColor: Colors.black,
+                style: NativeTemplateFontStyle.bold,
+                size: 16.0),
+            tertiaryTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.brown,
+                backgroundColor: Colors.amber,
+                style: NativeTemplateFontStyle.normal,
+                size: 16.0)))
+      ..load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: screenHeight * 0.5,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/main_img.png'),
+                    // Replace with your image path
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+            ],
+          ),
+          // loading native ad, if error occurs just show black container
+          Positioned(
+              right: screenWidth * 0.1,
+              left: screenWidth * 0.1,
+              top: screenHeight * 0.15,
+              child: (_nativeAdIsLoaded) ? adContainer : Container(
+                width: 500,
+                height: 200,
+                color: Colors.black,
+              )),
+          Positioned(
+            right: screenWidth * 0.1,
+            left: screenWidth * 0.1,
+            top: screenHeight * 0.37,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Cplusplus()));
+              },
+              child: Container(
+                height: screenHeight * 0.18,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  shape: BoxShape.rectangle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5), // Shadow color
+                      spreadRadius: 3, // Spread radius
+                      blurRadius: 7, // Blur radius
+                      offset: Offset(0, 3), // Changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      double img_size = constraints.maxHeight * 0.6;
+                      return Image.asset(
+                        'assets/c++.png',
+                        height: img_size,
+                      );
+                    }),
+                    LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      double font_size = constraints.maxHeight * 0.3;
+                      return Text(
+                        'C++',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                              fontSize: font_size, color: Color(0xFF5B1CAE)),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: screenWidth * 0.1,
+            left: screenWidth * 0.1,
+            top: screenHeight * 0.57,
+            child: Container(
+              height: screenHeight * 0.18,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                shape: BoxShape.rectangle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5), // Shadow color
+                    spreadRadius: 3, // Spread radius
+                    blurRadius: 7, // Blur radius
+                    offset: Offset(0, 3), // Changes position of shadow
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  LayoutBuilder(builder:
+                      (BuildContext context, BoxConstraints constraints) {
+                    double img_size = constraints.maxHeight * 0.6;
+                    return Image.asset(
+                      'assets/java.png',
+                      height: img_size,
+                    );
+                  }),
+                  LayoutBuilder(builder:
+                      (BuildContext context, BoxConstraints constraints) {
+                    double font_size = constraints.maxHeight * 0.3;
+                    return Text(
+                      'Java',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                            fontSize: font_size, color: Color(0xFF5B1CAE)),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            right: screenWidth * 0.1,
+            left: screenWidth * 0.1,
+            top: screenHeight * 0.77,
+            child: Container(
+              height: screenHeight * 0.18,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                shape: BoxShape.rectangle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5), // Shadow color
+                    spreadRadius: 3, // Spread radius
+                    blurRadius: 7, // Blur radius
+                    offset: Offset(0, 3), // Changes position of shadow
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(left: 20.0.sp),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      double img_size = constraints.maxHeight * 0.6;
+                      return Image.asset(
+                        'assets/python.png',
+                        height: img_size,
+                      );
+                    }),
+                    LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      double font_size = constraints.maxHeight * 0.3;
+                      return Text(
+                        'Python',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                              fontSize: font_size, color: Color(0xFF5B1CAE)),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
